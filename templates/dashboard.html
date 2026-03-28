@@ -1,0 +1,432 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard - Privacy Cloud{% endblock %}
+{% block page_title %}My Files{% endblock %}
+
+{% block body %}
+<style>
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .file-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-md);
+    padding: 1.5rem;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  .file-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-8px) rotateX(5deg) rotateY(5deg) scale(1.02);
+  }
+
+  .file-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .file-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--border-radius-sm);
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
+
+  .file-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background: var(--bg-main);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+  }
+
+  .file-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    word-break: break-all;
+    font-size: 1.1rem;
+  }
+
+  .file-meta {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .file-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .file-actions .btn-secondary,
+  .file-actions .btn-primary,
+  .file-actions .btn-danger {
+    flex: 1;
+    padding: 0.6rem;
+    font-size: 0.875rem;
+    margin: 0;
+  }
+
+  /* Preview Modal Styles */
+  .preview-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+  }
+
+  .preview-modal.show {
+    display: flex;
+  }
+
+  .preview-content {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 1000px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .preview-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .close-modal {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .close-modal:hover {
+    color: var(--text-primary);
+  }
+
+  .preview-body {
+    flex: 1;
+    overflow: auto;
+    min-height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .preview-image {
+    max-width: 100%;
+    max-height: 65vh;
+    border-radius: var(--border-radius-sm);
+    object-fit: contain;
+  }
+
+  .preview-text {
+    width: 100%;
+    background: var(--bg-main);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-sm);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+  }
+</style>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+  <div>
+    <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">My Secured Files</h2>
+    <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary);">Manage your end-to-end encrypted storage</p>
+  </div>
+  <div style="display: flex; gap: 1rem;">
+    <button id="refreshFiles" class="btn-secondary" style="margin: 0;"><i class="fa-solid fa-rotate"></i>
+      Refresh</button>
+    <a href="{{ url_for('upload') }}" class="btn-primary" style="margin: 0;"><i class="fa-solid fa-plus"></i> New
+      Upload</a>
+  </div>
+</div>
+
+<div id="filesContainer">
+  <div style="text-align: center; padding: 5rem 2rem; color: var(--text-muted);">
+    <i class="fa-solid fa-spinner fa-spin fa-2x" style="margin-bottom: 1rem;"></i>
+    <p>Retrieving your encrypted file list...</p>
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div id="previewModal" class="preview-modal">
+  <div class="preview-content">
+    <div class="preview-header">
+      <div class="preview-title" id="previewTitle">File Preview</div>
+      <button class="close-modal" onclick="closePreview()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="previewBody" class="preview-body"></div>
+    <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+      <button class="btn-secondary" onclick="closePreview()" style="margin: 0;">Close</button>
+      <button class="btn-primary" onclick="downloadFromPreview()" style="margin: 0;"><i
+          class="fa-solid fa-download"></i> Download Original</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (async function () {
+    const escapeHtml = (text) => {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    };
+
+    let currentPreviewFile = { id: null, name: null, blob: null };
+
+    async function loadFiles() {
+      try {
+        const res = await fetch("/api/files");
+        const j = await res.json();
+
+        if (!res.ok) {
+          showNotification(j.error || "Could not load files", "error");
+          return;
+        }
+
+        const container = document.getElementById("filesContainer");
+
+        if (!j.files || j.files.length === 0) {
+          container.innerHTML = `
+                        <div style="text-align: center; padding: 5rem 2rem; border: 2px dashed var(--border); border-radius: var(--border-radius-lg);">
+                            <div style="font-size: 3rem; margin-bottom: 1.5rem; opacity: 0.5;">📂</div>
+                            <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">No files found</h3>
+                            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">You haven't uploaded any encrypted files yet.</p>
+                            <a href="{{ url_for('upload') }}" class="btn-primary" style="margin: 0;">Start First Upload</a>
+                        </div>
+                    `;
+          return;
+        }
+
+        const getFileIcon = (filename) => {
+          const ext = filename.toLowerCase().split('.').pop();
+          const icons = {
+            video: ['mp4', 'webm', 'avi', 'mov', 'mkv'],
+            image: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
+            pdf: ['pdf'],
+            doc: ['doc', 'docx', 'txt', 'rtf', 'md'],
+            audio: ['mp3', 'wav', 'm4a', 'flac'],
+            code: ['js', 'py', 'java', 'html', 'css', 'json', 'sql'],
+            zip: ['zip', 'rar', 'tar', 'gz']
+          };
+
+          if (icons.video.includes(ext)) return 'fa-file-video';
+          if (icons.image.includes(ext)) return 'fa-file-image';
+          if (icons.pdf.includes(ext)) return 'fa-file-pdf';
+          if (icons.doc.includes(ext)) return 'fa-file-lines';
+          if (icons.audio.includes(ext)) return 'fa-file-audio';
+          if (icons.code.includes(ext)) return 'fa-file-code';
+          if (icons.zip.includes(ext)) return 'fa-file-zipper';
+          return 'fa-file';
+        };
+
+        const filesHTML = j.files.map(f => {
+          const sizeKB = (f.length / 1024).toFixed(2);
+          const sizeText = sizeKB > 1024 ? (f.length / (1024 * 1024)).toFixed(2) + " MB" : sizeKB + " KB";
+          const ext = f.filename.toLowerCase().split('.').pop();
+
+          return `
+                        <div class="file-card">
+                            <div class="file-header">
+                                <div class="file-icon"><i class="fa-solid ${getFileIcon(f.filename)}"></i></div>
+                                <span class="file-badge">${ext}</span>
+                            </div>
+                            <div class="file-name" title="${escapeHtml(f.filename)}">${escapeHtml(f.filename)}</div>
+                            <div class="file-meta">
+                                <span>${sizeText}</span>
+                                <span>${new Date(f.upload_date).toLocaleDateString()}</span>
+                            </div>
+                            <div class="file-actions">
+                                <button class="btn-secondary" onclick="viewFile('${f.file_id}', '${escapeHtml(f.filename)}')"><i class="fa-solid fa-eye"></i> View</button>
+                                <button class="btn-primary" onclick="downloadAndDecrypt('${f.file_id}', '${escapeHtml(f.filename)}')"><i class="fa-solid fa-download"></i></button>
+                                <button class="btn-danger" style="flex: 0 0 45px;" onclick="deleteFile('${f.file_id}')"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+        }).join("");
+
+        container.innerHTML = `<div class="dashboard-grid">${filesHTML}</div>`;
+      } catch (err) {
+        console.error(err);
+        showNotification("Failed to load files", "error");
+      }
+    }
+
+    async function downloadAndDecrypt(file_id, displayName) {
+      const password = sessionStorage.getItem("password_for_key");
+      const enc_salt = sessionStorage.getItem("enc_salt");
+
+      if (!password || !enc_salt) {
+        showNotification("Session expired. Please login again.", "error");
+        setTimeout(() => window.location = "/login", 2000);
+        return;
+      }
+
+      showNotification("⏳ Downloading and decrypting...", "info");
+
+      try {
+        const key = await deriveKeyFromPassword(password, enc_salt);
+        const res = await fetch("/api/download/" + file_id);
+
+        if (!res.ok) {
+          const j = await res.json().catch(() => ({}));
+          showNotification(j.error || "Download failed", "error");
+          return;
+        }
+
+        const iv_b64 = res.headers.get("X-File-IV");
+        const origName = res.headers.get("X-Orig-Filename") || displayName;
+        const encrypted = await res.arrayBuffer();
+
+        const iv = base64ToArrayBuffer(iv_b64);
+        const decrypted = await decryptArrayBuffer(encrypted, key, iv);
+
+        const blob = new Blob([decrypted]);
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = origName;
+        a.click();
+        URL.revokeObjectURL(a.href);
+
+        showNotification("✓ File decrypted and downloaded!", "success");
+      } catch (err) {
+        console.error(err);
+        showNotification("Decryption failed: " + err.message, "error");
+      }
+    }
+
+    async function viewFile(file_id, displayName) {
+      const password = sessionStorage.getItem("password_for_key");
+      const enc_salt = sessionStorage.getItem("enc_salt");
+
+      if (!password || !enc_salt) {
+        showNotification("Session expired. Please login again.", "error");
+        return;
+      }
+
+      showNotification("⏳ Preparing preview...", "info");
+
+      try {
+        const key = await deriveKeyFromPassword(password, enc_salt);
+        const res = await fetch("/api/download/" + file_id);
+
+        if (!res.ok) {
+          showNotification("Failed to load file", "error");
+          return;
+        }
+
+        const iv_b64 = res.headers.get("X-File-IV");
+        const origName = res.headers.get("X-Orig-Filename") || displayName;
+        const encrypted = await res.arrayBuffer();
+        const iv = base64ToArrayBuffer(iv_b64);
+        const decrypted = await decryptArrayBuffer(encrypted, key, iv);
+
+        currentPreviewFile = { id: file_id, name: origName, blob: new Blob([decrypted]) };
+
+        const ext = origName.toLowerCase().split('.').pop();
+        const previewBody = document.getElementById('previewBody');
+        const previewTitle = document.getElementById('previewTitle');
+
+        previewTitle.textContent = escapeHtml(origName);
+
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
+          previewBody.innerHTML = `<img src="${URL.createObjectURL(currentPreviewFile.blob)}" class="preview-image" />`;
+        } else if (['mp4', 'webm', 'ogg'].includes(ext)) {
+          previewBody.innerHTML = `<video controls autoplay class="preview-image"><source src="${URL.createObjectURL(currentPreviewFile.blob)}"></video>`;
+        } else if (['txt', 'json', 'xml', 'js', 'py', 'css', 'html', 'md', 'sql'].includes(ext)) {
+          const text = new TextDecoder().decode(decrypted);
+          previewBody.innerHTML = `<pre class="preview-text">${escapeHtml(text.substring(0, 5000))}${text.length > 5000 ? '\n\n... (truncated)' : ''}</pre>`;
+        } else if (ext === 'pdf') {
+          previewBody.innerHTML = `<iframe src="${URL.createObjectURL(currentPreviewFile.blob)}" style="width: 100%; height: 60vh; border: none;"></iframe>`;
+        } else {
+          previewBody.innerHTML = `<div style="text-align: center; padding: 2rem;"><i class="fa-solid fa-file fa-4x" style="margin-bottom: 1rem; opacity: 0.2;"></i><p>Preview not available for this file type.</p></div>`;
+        }
+
+        document.getElementById('previewModal').classList.add('show');
+      } catch (err) {
+        console.error(err);
+        showNotification("Preview failed", "error");
+      }
+    }
+
+    async function deleteFile(file_id) {
+      if (!confirm("Delete this file forever? This cannot be undone.")) return;
+
+      try {
+        const res = await fetch("/api/delete/" + file_id, { method: "POST" });
+        if (res.ok) {
+          showNotification("✓ File deleted", "success");
+          await loadFiles();
+        } else {
+          showNotification("Delete failed", "error");
+        }
+      } catch (err) {
+        showNotification("Delete error", "error");
+      }
+    }
+
+    window.viewFile = viewFile;
+    window.downloadAndDecrypt = downloadAndDecrypt;
+    window.deleteFile = deleteFile;
+    window.closePreview = () => document.getElementById('previewModal').classList.remove('show');
+    window.downloadFromPreview = () => {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(currentPreviewFile.blob);
+      a.download = currentPreviewFile.name;
+      a.click();
+    };
+
+    document.getElementById("refreshFiles").onclick = loadFiles;
+    await loadFiles();
+  })();
+</script>
+{% endblock %}

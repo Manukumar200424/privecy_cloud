@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Privacy Cloud{% endblock %}</title>
+  <!-- CSS Dependencies -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* Professional Design System */
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+      --dark-gradient: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      --neon-glow: 0 0 20px rgba(102, 126, 234, 0.5);
+      --card-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      --hover-shadow: 0 30px 80px rgba(102, 126, 234, 0.3);
+    }
+
+    body:not(.admin-page) {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e) !important;
+      background-size: 400% 400% !important;
+      animation: globalGradientShift 20s ease-in-out infinite;
+      position: relative;
+      perspective: 1000px;
+      overflow-x: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Fixed header for non-admin pages only */
+    body:not(.admin-page) header.app-header {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      animation: globalHeaderGlow 8s ease-in-out infinite;
+      transform-style: preserve-3d;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 72px;
+    }
+    
+    /* Override for admin page specific styling */
+    body.admin-page header.app-header {
+      background: rgba(30, 41, 59, 0.9);
+      animation: none;
+    }
+
+    /* Professional Brand */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      border-radius: 16px;
+      background: var(--primary-gradient);
+      box-shadow: var(--neon-glow);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .brand:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 0 30px rgba(102, 126, 234, 0.7);
+    }
+
+    .logo-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      filter: brightness(1.2) contrast(1.1);
+    }
+
+    .brand-name {
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+
+    /* Global 3D Floating Elements */
+    .global-3d-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      transform-style: preserve-3d;
+    }
+
+    .floating-3d-element {
+      position: absolute;
+      transform-style: preserve-3d;
+      animation: globalFloat3D 20s ease-in-out infinite;
+    }
+
+    .privacy-3d-cube {
+      width: 80px;
+      height: 80px;
+      position: absolute;
+      transform-style: preserve-3d;
+      animation: cubeRotate3D 15s linear infinite;
+    }
+
+    .cube-face-3d {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.25));
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--primary);
+    }
+
+    .cube-face-3d:nth-child(1) { transform: translateZ(40px); }
+    .cube-face-3d:nth-child(2) { transform: rotateY(90deg) translateZ(40px); }
+    .cube-face-3d:nth-child(3) { transform: rotateY(180deg) translateZ(40px); }
+    .cube-face-3d:nth-child(4) { transform: rotateY(-90deg) translateZ(40px); }
+    .cube-face-3d:nth-child(5) { transform: rotateX(90deg) translateZ(40px); }
+    .cube-face-3d:nth-child(6) { transform: rotateX(-90deg) translateZ(40px); }
+
+    /* 3D Privacy Images */
+    .privacy-3d-image {
+      position: absolute;
+      transform-style: preserve-3d;
+      animation: imageFloat3D 18s ease-in-out infinite;
+    }
+
+    .privacy-3d-image img {
+      width: 120px;
+      height: auto;
+      filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.6));
+      transform: rotateY(0deg);
+      transition: transform 0.6s ease;
+    }
+
+    .privacy-3d-image:hover img {
+      transform: rotateY(180deg);
+    }
+
+    /* 3D Animations */
+    @keyframes globalFloat3D {
+      0%, 100% {
+        transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
+      }
+      25% {
+        transform: translate3d(100px, -50px, 100px) rotateX(15deg) rotateY(90deg);
+      }
+      50% {
+        transform: translate3d(-50px, -100px, 200px) rotateX(-15deg) rotateY(180deg);
+      }
+      75% {
+        transform: translate3d(-100px, 50px, 100px) rotateX(15deg) rotateY(270deg);
+      }
+    }
+
+    @keyframes cubeRotate3D {
+      0% {
+        transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+      }
+      100% {
+        transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+      }
+    }
+
+    @keyframes imageFloat3D {
+      0%, 100% {
+        transform: translate3d(0, 0, 0) rotateY(0deg) scale(1);
+      }
+      33% {
+        transform: translate3d(80px, -40px, 150px) rotateY(120deg) scale(1.1);
+      }
+      66% {
+        transform: translate3d(-60px, 40px, 100px) rotateY(240deg) scale(0.9);
+      }
+    }
+
+    /* 3D Card Effects */
+    body:not(.admin-page) .card-v3,
+    body:not(.admin-page) .feature-card {
+      transform-style: preserve-3d;
+      transition: transform 0.6s ease;
+    }
+
+    body:not(.admin-page) .card-v3:hover,
+    body:not(.admin-page) .feature-card:hover {
+      transform: translateY(-12px) rotateX(5deg) rotateY(5deg) scale(1.02);
+    }
+
+    /* 3D Button Effects */
+    body:not(.admin-page) .btn-primary,
+    body:not(.admin-page) .btn-secondary,
+    body:not(.admin-page) .btn-v3 {
+      transform-style: preserve-3d;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    body:not(.admin-page) .btn-primary:hover,
+    body:not(.admin-page) .btn-secondary:hover,
+    body:not(.admin-page) .btn-v3:hover {
+      transform: translateY(-2px) rotateX(-2deg) rotateY(2deg);
+    }
+
+    /* Header Actions Layout */
+    body:not(.admin-page) .header-nav {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-left: auto;
+    }
+
+    body:not(.admin-page) .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Logout Button Styles */
+    body:not(.admin-page) .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      backdrop-filter: blur(10px);
+    }
+
+    body:not(.admin-page) .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.8);
+      border-color: rgba(239, 68, 68, 0.9);
+      color: white;
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    /* Professional Sidebar */
+    body:not(.admin-page) .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      margin: 8px 0;
+      border-radius: 16px;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+    }
+
+    body:not(.admin-page) .nav-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: var(--primary-gradient);
+      transition: left 0.3s ease;
+      z-index: -1;
+    }
+
+    body:not(.admin-page) .nav-link:hover {
+      color: white;
+      transform: translateZ(10px) rotateY(-5deg) translateX(5px);
+    }
+
+    body:not(.admin-page) .nav-link:hover::before {
+      left: 0;
+    }
+
+    body:not(.admin-page) .nav-link.active {
+      background: var(--primary-gradient);
+      color: white;
+      box-shadow: var(--neon-glow);
+    }
+
+    body:not(.admin-page) .nav-link i {
+      font-size: 1.2rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    body:not(.admin-page)::before,
+    body:not(.admin-page)::after {
+      content: "";
+      position: fixed;
+      inset: -20vh;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.55;
+      filter: blur(60px);
+      transform: translate3d(0, 0, 0);
+    }
+
+    body:not(.admin-page)::before {
+      background:
+        radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.45), transparent 55%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.35), transparent 55%),
+        radial-gradient(circle at 30% 85%, rgba(16, 185, 129, 0.20), transparent 60%);
+      animation: globalBlobFloatA 16s ease-in-out infinite;
+    }
+
+    body:not(.admin-page)::after {
+      background:
+        radial-gradient(circle at 70% 75%, rgba(59, 130, 246, 0.28), transparent 58%),
+        radial-gradient(circle at 15% 65%, rgba(236, 72, 153, 0.18), transparent 60%),
+        radial-gradient(circle at 55% 35%, rgba(139, 92, 246, 0.20), transparent 62%);
+      animation: globalBlobFloatB 20s ease-in-out infinite;
+    }
+
+    body:not(.admin-page) .app-container,
+    body:not(.admin-page) .main-content {
+      position: relative;
+      z-index: 1;
+      background: transparent;
+    }
+
+    /* Main content spacing for non-admin pages only */
+    body:not(.admin-page) .main-content {
+      max-width: 1200px;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      padding-left: 2rem;
+      padding-right: 2rem;
+      padding-top: 92px; /* Account for fixed header (72px + 20px spacing) */
+    }
+    
+    /* Fixed sidebar for non-admin pages only */
+    body:not(.admin-page) .app-sidebar {
+      position: fixed !important;
+      left: 0px !important;
+      top: 72px !important;
+      width: 260px !important;
+      height: calc(100vh - 72px) !important;
+      background: rgba(30, 41, 59, 0.95) !important;
+      border-right: 2px solid rgba(255, 255, 255, 0.3) !important;
+      padding: 2rem 1rem !important;
+      padding-top: 1rem !important;
+      display: flex !important;
+      flex-direction: column !important;
+      z-index: 9999 !important;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      backdrop-filter: blur(12px) !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.5) !important;
+      transform: translateX(0px) !important;
+      margin-left: 0px !important;
+      overflow: visible !important;
+    }
+
+    @keyframes globalGradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    @keyframes globalBlobFloatA {
+      0% {
+        transform: translate3d(-3%, -2%, 0) scale(1);
+      }
+      50% {
+        transform: translate3d(3%, 2%, 0) scale(1.06);
+      }
+      100% {
+        transform: translate3d(-3%, -2%, 0) scale(1);
+      }
+    }
+
+    @keyframes globalBlobFloatB {
+      0% {
+        transform: translate3d(2%, 3%, 0) scale(1.02);
+      }
+      50% {
+        transform: translate3d(-2%, -3%, 0) scale(1.08);
+      }
+      100% {
+        transform: translate3d(2%, 3%, 0) scale(1.02);
+      }
+    }
+
+    @keyframes globalHeaderGlow {
+      0% {
+        box-shadow: 0 12px 55px rgba(59, 130, 246, 0.16);
+      }
+      50% {
+        box-shadow: 0 18px 75px rgba(139, 92, 246, 0.20);
+      }
+      100% {
+        box-shadow: 0 12px 55px rgba(59, 130, 246, 0.16);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body:not(.admin-page) {
+        animation: none;
+      }
+
+      body:not(.admin-page)::before,
+      body:not(.admin-page)::after {
+        animation: none;
+      }
+
+      body:not(.admin-page) header.app-header {
+        animation: none;
+      }
+      
+      .privacy-3d-cube,
+      .privacy-3d-image {
+        animation: none;
+      }
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .privacy-3d-cube {
+        width: 40px;
+        height: 40px;
+      }
+      
+      .cube-face-3d {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+      }
+      
+      .cube-face-3d:nth-child(1) { transform: translateZ(20px); }
+      .cube-face-3d:nth-child(2) { transform: rotateY(90deg) translateZ(20px); }
+      .cube-face-3d:nth-child(3) { transform: rotateY(180deg) translateZ(20px); }
+      .cube-face-3d:nth-child(4) { transform: rotateY(-90deg) translateZ(20px); }
+      .cube-face-3d:nth-child(5) { transform: rotateX(90deg) translateZ(20px); }
+      .cube-face-3d:nth-child(6) { transform: rotateX(-90deg) translateZ(20px); }
+      
+      .privacy-3d-image img {
+        width: 60px;
+      }
+      
+      .global-3d-container {
+        display: none;
+      }
+    }
+
+    /* Performance Optimizations */
+    @media (max-width: 1024px) {
+      body:not(.admin-page) {
+        perspective: 500px;
+      }
+      
+      .privacy-3d-cube {
+        animation-duration: 25s;
+      }
+      
+      .privacy-3d-image {
+        animation-duration: 22s;
+      }
+    }
+  </style>
+</head>
+
+<body class="{% if request.path and request.path.startswith('/admin') %}admin-page{% endif %}">
+  <!-- Global 3D Animated Elements -->
+  <div class="global-3d-container">
+    <!-- 3D Privacy Cubes -->
+    <div class="privacy-3d-cube floating-3d-element" style="top: 10%; left: 5%; animation-delay: 0s;">
+      <div class="cube-face-3d"><i class="fa-solid fa-shield-halved"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-lock"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-key"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-cloud"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-user-secret"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-database"></i></div>
+    </div>
+    
+    <div class="privacy-3d-cube floating-3d-element" style="top: 20%; right: 8%; animation-delay: 3s;">
+      <div class="cube-face-3d"><i class="fa-solid fa-server"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-code"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-folder"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-upload"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-download"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-cog"></i></div>
+    </div>
+    
+    <div class="privacy-3d-cube floating-3d-element" style="bottom: 15%; left: 12%; animation-delay: 6s;">
+      <div class="cube-face-3d"><i class="fa-solid fa-globe"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-network-wired"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-microchip"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-fingerprint"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-bolt"></i></div>
+      <div class="cube-face-3d"><i class="fa-solid fa-shield-alt"></i></div>
+    </div>
+    
+    <!-- 3D Privacy Images -->
+    <div class="privacy-3d-image" style="top: 30%; right: 15%; animation-delay: 2s;">
+      <img src="{{ url_for('static', filename='images/Manu.png') }}" alt="Privacy Cloud 3D">
+    </div>
+    
+    <div class="privacy-3d-image" style="top: 60%; left: 8%; animation-delay: 5s;">
+      <img src="{{ url_for('static', filename='images/Manu.png') }}" alt="Privacy Cloud 3D">
+    </div>
+    
+    <div class="privacy-3d-image" style="bottom: 25%; right: 10%; animation-delay: 8s;">
+      <img src="{{ url_for('static', filename='images/Manu.png') }}" alt="Privacy Cloud 3D">
+    </div>
+  </div>
+  
+  <div class="app-container">
+    <!-- Universal Header -->
+    <header class="app-header">
+      <a href="/" class="brand">
+        <img src="{{ url_for('static', filename='images/Manu.png') }}" alt="Privacy Cloud Logo" class="logo-img">
+        <span class="brand-name">Privacy Cloud</span>
+      </a>
+
+      <div class="header-nav">
+        {% if session.user_id %}
+        <div class="header-actions">
+          <a href="{{ url_for('profile') }}" class="user-profile-badge">
+            <div class="avatar-sm">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="user-info">
+              <span class="user-name">{{ username or session.username or 'Member' }}</span>
+              <span class="user-status">Secured</span>
+            </div>
+          </a>
+          <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="nav-link" style="display: inline;">Login</a>
+        <a href="{{ url_for('register') }}" class="btn-primary">Get Started</a>
+        {% endif %}
+      </div>
+    </header>
+
+    {% if session.user_id %}
+    <!-- Sidebar for Authenticated Users -->
+    <aside class="app-sidebar">
+      <nav class="nav-group">
+        <a href="{{ url_for('home') }}" class="nav-link {% if request.path == url_for('home') %}active{% endif %}">
+          <i class="fa-solid fa-house"></i> Overview
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="nav-link {% if 'dashboard' in request.path %}active{% endif %}">
+          <i class="fa-solid fa-folder-tree"></i> My Files
+        </a>
+        <a href="{{ url_for('upload') }}" class="nav-link {% if 'upload' in request.path %}active{% endif %}">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Upload
+        </a>
+        <div style="margin: 1rem 0; height: 1px; background: var(--border);"></div>
+        <a href="{{ url_for('profile') }}" class="nav-link {% if 'profile' in request.path %}active{% endif %}">
+          <i class="fa-solid fa-user-gear"></i> Account Settings
+        </a>
+        <a href="{{ url_for('support') }}" class="nav-link {% if 'support' in request.path %}active{% endif %}">
+          <i class="fa-solid fa-circle-question"></i> Help & Support
+        </a>
+        {% if session.is_admin %}
+        <a href="{{ url_for('admin') }}" class="nav-link {% if 'admin' in request.path %}active{% endif %}">
+          <i class="fa-solid fa-user-shield"></i> Admin Panel
+        </a>
+        {% endif %}
+      </nav>
+    </aside>
+    {% endif %}
+
+    <!-- Main Content Area -->
+    <main class="main-content {% if not session.user_id %}no-sidebar{% endif %}">
+      <div id="notification"></div>
+
+      {% if block_title %}
+      <div class="page-header mb-4">
+        <h2 class="font-heading">{% block page_title %}{% endblock %}</h2>
+      </div>
+      {% endif %}
+
+      {% block body %}{% endblock %}
+    </main>
+  </div>
+
+  <!-- Scripting -->
+  <script src="{{ url_for('static', filename='crypto.js') }}"></script>
+  <script>
+    function showNotification(message, type = 'info') {
+      const notification = document.getElementById('notification');
+      if (notification) {
+        notification.innerHTML = `<div class="alert ${type}">${message}</div>`;
+        setTimeout(() => {
+          notification.innerHTML = '';
+        }, 5000);
+      }
+    }
+
+    // Global alert override
+    window.alert = function (msg) {
+      showNotification(msg, 'error');
+    };
+
+    // UI Helpers
+    document.addEventListener('DOMContentLoaded', () => {
+      // Add any global UI logic here
+    });
+  </script>
+</body>
+
+</html>

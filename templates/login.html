@@ -1,0 +1,254 @@
+{% extends "layout.html" %}
+
+{% block title %}Login - Privacy Cloud{% endblock %}
+
+{% block body %}
+<style>
+  @keyframes authFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes glow {
+
+    0%,
+    100% {
+      opacity: 0.7;
+    }
+
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* Colorful radial gradient behind things */
+  .main-content {
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.14) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+      #0f172a !important;
+  }
+
+  /* ── Card ── */
+  .auth-card {
+    max-width: 460px;
+    width: 100%;
+    margin: 5rem auto;
+    padding: 0;
+    position: relative;
+    border-radius: 24px;
+    background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow:
+      0 0 0 1px rgba(59, 130, 246, 0.12),
+      0 25px 60px rgba(0, 0, 0, 0.55),
+      0 0 80px -20px rgba(59, 130, 246, 0.2);
+    animation: authFadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease;
+  }
+
+  .auth-card:hover {
+    transform: rotateY(2deg) rotateX(-2deg) scale(1.02);
+  }
+
+  /* Glowing rainbow top bar */
+  .auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #8b5cf6, #3b82f6);
+    background-size: 200% 100%;
+    border-radius: 24px 24px 0 0;
+    animation: glow 2.5s ease-in-out infinite;
+  }
+
+  /* ── Header ── */
+  .auth-header {
+    text-align: center;
+    padding: 3.5rem 3rem 2rem;
+    margin-bottom: 0;
+  }
+
+  .auth-header h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.6rem;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin: 0 0 0.75rem;
+    color: white;
+  }
+
+  .auth-header h2 em {
+    font-style: normal;
+    background: linear-gradient(135deg, #60a5fa 30%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .auth-header p {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  /* ── Form ── */
+  .form-group {
+    margin: 0;
+    padding: 0 3rem 1.25rem;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 0.95rem 1.2rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: #f1f5f9;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.25s;
+    box-sizing: border-box;
+  }
+
+  .form-group input::placeholder {
+    color: #334155;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.07);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18), 0 2px 12px rgba(59, 130, 246, 0.15);
+  }
+
+  /* ── Submit Button ── */
+  #loginBtn {
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.45) !important;
+  }
+
+  #loginBtn:hover:not(:disabled) {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.6) !important;
+  }
+
+  /* ── Footer ── */
+  .auth-footer {
+    padding: 1.5rem 3rem 2.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+    font-size: 0.875rem;
+    color: #475569;
+    margin-top: 0.5rem;
+  }
+
+  .auth-footer a {
+    color: #60a5fa;
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.2s;
+  }
+
+  .auth-footer a:hover {
+    color: #bfdbfe;
+    text-decoration: underline;
+  }
+</style>
+
+<div class="auth-card">
+  <div class="auth-header">
+    <h2>Welcome <em>Back</em></h2>
+    <p>Login to access your secure vault</p>
+  </div>
+
+  <form id="loginForm" onsubmit="return false;">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter your username" required>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password" required>
+    </div>
+
+    <div class="form-group">
+      <button id="loginBtn" class="btn-primary" style="width: 100%; margin: 0; padding: 0.875rem;">Login</button>
+    </div>
+  </form>
+
+  <div class="auth-footer">
+    Don't have an account? <a href="{{ url_for('register') }}">Create one now</a>
+  </div>
+</div>
+
+<script>
+  document.getElementById("loginBtn").onclick = async () => {
+    const button = document.getElementById("loginBtn");
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!username || !password) {
+      showNotification("Please enter both username and password", "error");
+      return;
+    }
+
+    button.disabled = true;
+    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
+
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const j = await res.json();
+
+      if (res.ok && j.ok) {
+        sessionStorage.setItem("enc_salt", j.enc_salt);
+        sessionStorage.setItem("username", j.username);
+        sessionStorage.setItem("password_for_key", password);
+        showNotification("Success! Entering Privacy Cloud...", "success");
+        setTimeout(() => { window.location = "/home"; }, 1000);
+      } else {
+        showNotification(j.error || "Invalid username or password", "error");
+      }
+    } catch (err) {
+      showNotification("Network error. Please try again.", "error");
+    } finally {
+      button.disabled = false;
+      button.textContent = "Login";
+    }
+  };
+</script>
+{% endblock %}

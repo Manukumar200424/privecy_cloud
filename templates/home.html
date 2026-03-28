@@ -1,0 +1,586 @@
+{% extends "layout.html" %}
+
+{% block title %}Home - Privacy Cloud{% endblock %}
+{% block page_title %}Overview{% endblock %}
+
+{% block body %}
+<style>
+  :root {
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glow-primary: rgba(59, 130, 246, 0.4);
+  }
+
+  /* Keyframe Animations */
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    }
+
+    70% {
+      box-shadow: 0 0 0 15px rgba(59, 130, 246, 0);
+    }
+
+    100% {
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    }
+  }
+
+  .home-container {
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  /* Professional Hero Section */
+  .hero-v3 {
+    position: relative;
+    padding: 6rem 4rem;
+    text-align: center;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 32px;
+    margin-bottom: 4rem;
+    overflow: hidden;
+    box-shadow: var(--glass-shadow);
+    transform-style: preserve-3d;
+    transition: all 0.6s ease;
+  }
+
+  .hero-v3:hover {
+    transform: translateY(-5px) rotateX(2deg) rotateY(-2deg);
+    box-shadow: var(--hover-shadow);
+  }
+
+  .hero-glass {
+    backdrop-filter: blur(15px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    border: 1px solid var(--glass-border);
+    padding: 4rem;
+    border-radius: 24px;
+    display: inline-block;
+    max-width: 900px;
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-glass::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--primary-gradient);
+    border-radius: 24px 24px 0 0;
+  }
+
+  .hero-title-v3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 4.5rem;
+    font-weight: 900;
+    background: linear-gradient(180deg, #fff 0%, #94a3b8 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1.5rem;
+    letter-spacing: -3px;
+    line-height: 1;
+  }
+
+  .hero-desc-v3 {
+    font-size: 1.4rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  /* Floating Elements for "Wow" */
+  .floating-gear {
+    position: absolute;
+    font-size: 8rem;
+    opacity: 0.03;
+    animation: float 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* Minimalist Action Grid */
+  .grid-v3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 6rem;
+  }
+
+  .card-v3 {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 3rem 2rem;
+    border-radius: var(--border-radius-md);
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(8px);
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card-v3:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--primary);
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.3);
+  }
+
+  .icon-v3 {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .icon-v3::after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    filter: blur(25px);
+    opacity: 0.3;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .card-v3 h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 1rem;
+    letter-spacing: -0.5px;
+  }
+
+  .card-v3 p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  /* Security Badge Section */
+  .security-line {
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+    padding: 4rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4rem;
+  }
+
+  .badge-v3 {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .badge-v3 i {
+    font-size: 1.2rem;
+    color: var(--success);
+  }
+
+  .btn-v3 {
+    background: var(--primary);
+    color: white;
+    padding: 1.2rem 3rem;
+    border-radius: 100px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.5);
+  }
+
+  .btn-v3:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.6);
+    background: #4f8df7;
+  }
+
+  /* 3D Logo Container - Enhanced with 3D Perspective */
+  .logo-top-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+    position: relative;
+    height: 220px;
+    perspective: 1000px;
+  }
+
+  .logo-3d-wrapper {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    transform-style: preserve-3d;
+    animation: logo3DRotate 12s linear infinite;
+  }
+
+  .floating-logo-v3 {
+    width: 180px;
+    height: auto;
+    filter: drop-shadow(0 0 40px rgba(59, 130, 246, 0.6));
+    animation: professionalFloat 6s ease-in-out infinite;
+    position: relative;
+    z-index: 1;
+    transform-style: preserve-3d;
+  }
+
+  .logo-glow {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    background: var(--primary);
+    filter: blur(80px);
+    opacity: 0.25;
+    border-radius: 50%;
+    animation: glowPulse 4s ease-in-out infinite alternate;
+  }
+
+  /* 3D Cube Animation */
+  @keyframes logo3DRotate {
+    0% {
+      transform: rotateY(0deg) rotateX(0deg);
+    }
+    25% {
+      transform: rotateY(90deg) rotateX(15deg);
+    }
+    50% {
+      transform: rotateY(180deg) rotateX(0deg);
+    }
+    75% {
+      transform: rotateY(270deg) rotateX(-15deg);
+    }
+    100% {
+      transform: rotateY(360deg) rotateX(0deg);
+    }
+  }
+
+  @keyframes professionalFloat {
+    0%,
+    100% {
+      transform: translateY(0) rotateZ(0deg);
+    }
+    50% {
+      transform: translateY(-25px) rotateZ(2deg);
+    }
+  }
+
+  @keyframes glowPulse {
+    from {
+      opacity: 0.1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0.3;
+      transform: scale(1.2);
+    }
+  }
+
+  /* Additional 3D Floating Elements */
+  .cube-3d {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    transform-style: preserve-3d;
+    animation: cubeFloat 8s ease-in-out infinite;
+  }
+
+  .cube-face {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.3));
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    backdrop-filter: blur(10px);
+  }
+
+  .cube-face:nth-child(1) { transform: translateZ(30px); }
+  .cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(30px); }
+  .cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(30px); }
+  .cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(30px); }
+  .cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(30px); }
+  .cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(30px); }
+
+  @keyframes cubeFloat {
+    0%, 100% {
+      transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
+    }
+    50% {
+      transform: translate3d(20px, -30px, 50px) rotateX(180deg) rotateY(180deg);
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .logo-floating-container {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .grid-v3 {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-title-v3 {
+      font-size: 3rem;
+    }
+
+    .security-line {
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+  }
+</style>
+
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero-v3">
+    <i class="fa-solid fa-shield-halved floating-gear" style="top: 10%; left: 5%;"></i>
+    <i class="fa-solid fa-lock floating-gear" style="bottom: 15%; right: 8%; animation-delay: 2s;"></i>
+    <i class="fa-solid fa-key floating-gear" style="top: 40%; right: 15%; animation-delay: 4s;"></i>
+
+    <div class="hero-glass" style="position: relative; z-index: 2;">
+      <div class="logo-top-container">
+        <div class="logo-glow"></div>
+        <div class="logo-3d-wrapper">
+          <img src="{{ url_for('static', filename='images/Manu.png') }}" class="floating-logo-v3"
+            alt="Privacy Cloud Logo">
+        </div>
+        <!-- 3D Floating Cubes -->
+        <div class="cube-3d" style="top: -40px; left: -80px; animation-delay: 0s;">
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+        </div>
+        <div class="cube-3d" style="top: 60px; right: -70px; animation-delay: 2s;">
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+        </div>
+        <div class="cube-3d" style="bottom: -30px; left: 50px; animation-delay: 4s;">
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+          <div class="cube-face"></div>
+        </div>
+      </div>
+      <div
+        style="font-size: 0.8rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 1.5rem;">
+        The Future of Privacy</div>
+      <h1 class="hero-title-v3">Encrypted by you.</h1>
+      <p class="hero-desc-v3">A zero-knowledge digital vault built for those who value absolute privacy. No backdoors.
+        No tracking. Just security.</p>
+
+      <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('upload') }}" class="btn-v3">
+          <i class="fa-solid fa-plus"></i> New Secure Upload
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn-secondary"
+          style="margin: 0; padding: 1.2rem 3rem; border-radius: 100px;">
+          Explore Vault
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Line -->
+  <div class="security-line">
+    <div class="badge-v3"><i class="fa-solid fa-circle-check"></i> AES-256 Engine</div>
+    <div class="badge-v3"><i class="fa-solid fa-circle-check"></i> Zero-Knowledge</div>
+    <div class="badge-v3"><i class="fa-solid fa-circle-check"></i> Client-Side Keys</div>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="grid-v3">
+    <a href="{{ url_for('upload') }}" class="card-v3">
+      <div class="icon-v3"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+      <h3>Rapid Upload</h3>
+      <p>Hardware-accelerated encryption in your browser before upload.</p>
+    </a>
+
+    <a href="{{ url_for('dashboard') }}" class="card-v3" style="border-color: rgba(59, 130, 246, 0.4);">
+      <div class="icon-v3" style="color: #fff;"><i class="fa-solid fa-folder-tree"></i></div>
+      <h3 style="color: var(--primary);">Secure Explorer</h3>
+      <p>Manage your encrypted assets with a desktop-class interface.</p>
+    </a>
+
+    <a href="{{ url_for('profile') }}" class="card-v3">
+      <div class="icon-v3"><i class="fa-solid fa-fingerprint"></i></div>
+      <h3>Vault Identity</h3>
+      <p>View storage diagnostics and manage your unique security profile.</p>
+    </a>
+  </div>
+
+  <!-- Bottom CTA / Stats -->
+  <div
+    style="text-align: center; padding: 4rem; background: var(--glass-bg); border: 1px solid var(--border); border-radius: var(--border-radius-lg); backdrop-filter: blur(10px); margin-bottom: 6rem;">
+    <h2 style="font-size: 2rem; font-weight: 800; color: white; margin-bottom: 1rem;">Military-grade by default.</h2>
+    <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 2rem;">Used by professionals who demand the
+      highest standard of cryptographic isolation.</p>
+    <div style="display: flex; justify-content: center; gap: 2rem;">
+      <div style="text-align: center;">
+        <div style="font-size: 1.5rem; font-weight: 900; color: white;">256-bit</div>
+        <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">AES Standard</div>
+      </div>
+      <div style="width: 1px; background: var(--border);"></div>
+      <div style="text-align: center;">
+        <div style="font-size: 1.5rem; font-weight: 900; color: white;">200k</div>
+        <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">PBKDF2 Iterations</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Information Sections -->
+  <section style="margin-bottom: 6rem;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
+      <div>
+        <h2
+          style="font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 1.5rem; line-height: 1.2;">
+          Our Philosophy: <br><span style="color: var(--primary);">Absolute Invisibility</span></h2>
+        <p style="color: var(--text-secondary); font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem;">
+          At Privacy Cloud, we believe that you shouldn't have to trust us with your data. That's why we built a
+          <strong>Zero-Knowledge</strong> architecture where we are mathematically incapable of accessing your files.
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <div
+              style="padding: 0.5rem; background: rgba(16, 185, 129, 0.1); color: var(--success); border-radius: 8px;">
+              <i class="fa-solid fa-lock-open"></i>
+            </div>
+            <div>
+              <h4 style="color: white; margin-bottom: 0.25rem;">No Backdoors</h4>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">We don't hold your masters keys. If you lose your
+                password, even we can't recover your data.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <div
+              style="padding: 0.5rem; background: rgba(59, 130, 246, 0.1); color: var(--primary); border-radius: 8px;">
+              <i class="fa-solid fa-code-merge"></i>
+            </div>
+            <div>
+              <h4 style="color: white; margin-bottom: 0.25rem;">Open Standards</h4>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">We use industry-standard Web Crypto APIs, ensuring
+                your encryption is audited and peer-reviewed.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        style="position: relative; padding: 2rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--border-radius-lg); backdrop-filter: blur(10px);">
+        <h3 style="color: white; margin-bottom: 2rem; text-align: center;"><i class="fa-solid fa-shield-halved"
+            style="color: var(--primary); margin-right: 0.5rem;"></i> The Privacy Flow</h3>
+        <div style="display: flex; flex-direction: column; gap: 2rem; position: relative;">
+          <!-- Connecting Line -->
+          <div
+            style="position: absolute; left: 24px; top: 20px; bottom: 20px; width: 2px; background: linear-gradient(to bottom, var(--primary), transparent);">
+          </div>
+
+          <div style="display: flex; gap: 1.5rem; position: relative; z-index: 1;">
+            <div
+              style="width: 48px; height: 48px; background: var(--bg-main); border: 2px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: 800; flex-shrink: 0;">
+              1</div>
+            <div>
+              <h5 style="color: white; margin-bottom: 0.25rem;">Client-Side Encryption</h5>
+              <p style="color: var(--text-muted); font-size: 0.85rem;">Your file is locked using your password before it
+                leaves your device.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 1.5rem; position: relative; z-index: 1;">
+            <div
+              style="width: 48px; height: 48px; background: var(--bg-main); border: 2px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: 800; flex-shrink: 0;">
+              2</div>
+            <div>
+              <h5 style="color: white; margin-bottom: 0.25rem;">Secure Transit</h5>
+              <p style="color: var(--text-muted); font-size: 0.85rem;">Only the "noise" (encrypted data) is transmitted
+                over TLS secured channels.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 1.5rem; position: relative; z-index: 1;">
+            <div
+              style="width: 48px; height: 48px; background: var(--bg-main); border: 2px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: 800; flex-shrink: 0;">
+              3</div>
+            <div>
+              <h5 style="color: white; margin-bottom: 0.25rem;">Immutable Storage</h5>
+              <p style="color: var(--text-muted); font-size: 0.85rem;">Your data rests in our secure MongoDB GridFS
+                clouds, unreadable to the system.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final Trust Message -->
+  <div style="padding: 4rem; text-align: center; border-top: 1px solid var(--border);">
+    <h3 style="color: white; opacity: 0.5; font-size: 1.5rem; margin-bottom: 2rem;">Trusted Globally for Digital
+      Sovereignty</h3>
+    <div style="display: flex; justify-content: center; gap: 3rem; opacity: 0.3; filter: grayscale(1);">
+      <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1.2rem; color: white;">
+        <i class="fa-solid fa-building-shield"></i> ENTERPRISE
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1.2rem; color: white;">
+        <i class="fa-solid fa-user-shield"></i> GOVERNMENT
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1.2rem; color: white;">
+        <i class="fa-solid fa-briefcase"></i> PERSONAL
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,407 @@
+{% extends "layout.html" %}
+
+{% block title %}Upload - Privacy Cloud{% endblock %}
+{% block page_title %}Upload & Encrypt{% endblock %}
+
+{% block body %}
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes iconBounce {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes borderDash {
+    to {
+      stroke-dashoffset: -20;
+    }
+  }
+
+  @keyframes ringPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    }
+
+    70% {
+      box-shadow: 0 0 0 16px rgba(59, 130, 246, 0);
+    }
+
+    100% {
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    }
+  }
+
+  /* ── Main Card ── */
+  .upload-card {
+    background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 24px;
+    padding: 3.5rem;
+    margin-bottom: 2.5rem;
+    box-shadow:
+      0 0 0 1px rgba(59, 130, 246, 0.1),
+      0 25px 60px rgba(0, 0, 0, 0.45);
+    animation: fadeInUp 0.6s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle gradient accent at the top of the card */
+  .upload-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #3b82f6, #8b5cf6, transparent);
+  }
+
+  /* ── Drop Zone ── */
+  .upload-zone {
+    border: 2px dashed rgba(59, 130, 246, 0.3);
+    border-radius: 20px;
+    padding: 5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: rgba(59, 130, 246, 0.03);
+    position: relative;
+  }
+
+  .upload-zone:hover {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.07);
+    transform: scale(1.01);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+
+  .upload-zone.active {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.07);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+    animation: ringPulse 1s ease infinite;
+  }
+
+  /* ── Upload Icon ── */
+  .upload-icon {
+    font-size: 4rem;
+    color: #3b82f6;
+    margin-bottom: 1.5rem;
+    display: block;
+    animation: iconBounce 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.5));
+  }
+
+  /* ── File Preview List ── */
+  .file-preview-list {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .file-preview-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    transition: all 0.25s;
+  }
+
+  .file-preview-item:hover {
+    background: rgba(59, 130, 246, 0.06);
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateX(4px);
+  }
+
+  .file-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .file-details h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 0.15rem;
+    color: #f1f5f9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 280px;
+  }
+
+  .file-details span {
+    font-size: 0.78rem;
+    color: #475569;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Supported Formats Grid ── */
+  .type-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+    animation: fadeInUp 0.7s 0.15s ease both;
+  }
+
+  .type-card {
+    padding: 1.5rem;
+    background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .type-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  }
+
+  .type-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(59, 130, 246, 0.25);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .type-card h5 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0 0 0.6rem;
+    color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .type-card p {
+    font-size: 0.82rem;
+    color: #475569;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ── Upload Button ── */
+  #uploadBtn {
+    background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
+    border: none !important;
+    border-radius: 14px !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 6px 25px rgba(59, 130, 246, 0.4) !important;
+  }
+
+  #uploadBtn:hover:not(:disabled) {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 10px 35px rgba(59, 130, 246, 0.6) !important;
+    background: linear-gradient(135deg, #2563eb, #4f46e5) !important;
+  }
+</style>
+
+<div class="upload-card">
+  <div style="text-align: center; margin-bottom: 3rem;">
+    <h2 style="font-size: 2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem;">Secure File Upload
+    </h2>
+    <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">Everything you upload is encrypted
+      directly in your browser using AES-256. We never see your files or your encryption keys.</p>
+  </div>
+
+  <div class="upload-zone" id="uploadArea">
+    <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+    <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Click to select or drag and drop</h3>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">Maximum file size: 2GB per file</p>
+    <input type="file" id="fileInput" style="display: none;" multiple>
+  </div>
+
+  <div id="previewContainer" class="file-preview-list" style="display: none;">
+    <!-- Previews will appear here -->
+  </div>
+
+  <div style="margin-top: 2.5rem; text-align: center;">
+    <button id="uploadBtn" class="btn-primary"
+      style="padding: 1rem 3rem; font-size: 1.125rem; margin: 0; display: none;">
+      <i class="fa-solid fa-lock"></i> Encrypt & Upload
+    </button>
+  </div>
+</div>
+
+<h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Supported Formats</h3>
+<div class="type-grid">
+  <div class="type-card">
+    <h5><i class="fa-solid fa-file-video" style="color: #3b82f6;"></i> Video</h5>
+    <p>MP4, WebM, AVI, MOV, MKV, FLV, WMV</p>
+  </div>
+  <div class="type-card">
+    <h5><i class="fa-solid fa-file-image" style="color: #10b981;"></i> Images</h5>
+    <p>JPG, PNG, GIF, WebP, SVG, BMP, TIFF</p>
+  </div>
+  <div class="type-card">
+    <h5><i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i> Documents</h5>
+    <p>PDF, DOCX, XLSX, PPTX, TXT, CSV</p>
+  </div>
+  <div class="type-card">
+    <h5><i class="fa-solid fa-file-audio" style="color: #f59e0b;"></i> Audio</h5>
+    <p>MP3, WAV, M4A, FLAC, AAC, OGG</p>
+  </div>
+  <div class="type-card">
+    <h5><i class="fa-solid fa-file-code" style="color: #8b5cf6;"></i> Other</h5>
+    <p>Code, Archives, and almost any other file type</p>
+  </div>
+</div>
+
+<script>
+  (async function () {
+    const uploadArea = document.getElementById("uploadArea");
+    const fileInput = document.getElementById("fileInput");
+    const previewContainer = document.getElementById("previewContainer");
+    const uploadBtn = document.getElementById("uploadBtn");
+    let selectedFiles = [];
+
+    uploadArea.onclick = () => fileInput.click();
+
+    uploadArea.ondragover = (e) => {
+      e.preventDefault();
+      uploadArea.classList.add("active");
+    };
+
+    uploadArea.ondragleave = () => uploadArea.classList.remove("active");
+
+    uploadArea.ondrop = (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove("active");
+      handleFiles(e.dataTransfer.files);
+    };
+
+    fileInput.onchange = () => handleFiles(fileInput.files);
+
+    function handleFiles(files) {
+      selectedFiles = Array.from(files);
+      renderPreviews();
+    }
+
+    function renderPreviews() {
+      if (selectedFiles.length === 0) {
+        previewContainer.style.display = 'none';
+        uploadBtn.style.display = 'none';
+        return;
+      }
+
+      previewContainer.innerHTML = selectedFiles.map((file, idx) => {
+        const size = file.size > 1024 * 1024
+          ? (file.size / (1024 * 1024)).toFixed(1) + " MB"
+          : (file.size / 1024).toFixed(0) + " KB";
+
+        return `
+                    <div class="file-preview-item">
+                        <div class="file-info">
+                            <div style="font-size: 1.5rem; color: var(--text-muted);"><i class="fa-solid fa-file"></i></div>
+                            <div class="file-details">
+                                <h4>${file.name}</h4>
+                                <span>${size}</span>
+                            </div>
+                        </div>
+                        <button class="btn-icon" onclick="removeFile(${idx})" style="color: var(--danger);"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                `;
+      }).join("");
+
+      previewContainer.style.display = 'flex';
+      uploadBtn.style.display = 'inline-block';
+    }
+
+    window.removeFile = (idx) => {
+      selectedFiles.splice(idx, 1);
+      renderPreviews();
+    };
+
+    uploadBtn.onclick = async () => {
+      const enc_salt = sessionStorage.getItem("enc_salt");
+      const password = sessionStorage.getItem("password_for_key");
+
+      if (!enc_salt || !password) {
+        showNotification("Session expired. Please login again.", "error");
+        return;
+      }
+
+      uploadBtn.disabled = true;
+      const originalText = uploadBtn.innerHTML;
+
+      try {
+        const key = await deriveKeyFromPassword(password, enc_salt);
+
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const file = selectedFiles[i];
+          if (file.size > 2 * 1024 * 1024 * 1024) {
+            showNotification(`"${file.name}" exceeds 2GB limit`, "error");
+            continue;
+          }
+
+          uploadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing ${i + 1}/${selectedFiles.length}...`;
+
+          const { iv, ciphertext } = await encryptFileWithKey(file, key);
+
+          const form = new FormData();
+          form.append("file", new Blob([ciphertext]), "enc_" + file.name);
+          form.append("orig_filename", file.name);
+          form.append("iv", arrayBufferToBase64(iv));
+
+          const res = await fetch("/api/upload", { method: "POST", body: form });
+          const j = await res.json();
+
+          if (res.ok && j.ok) {
+            showNotification(`✓ Successfully uploaded ${file.name}`, "success");
+          } else {
+            showNotification(`Failed to upload ${file.name}: ${j.error}`, "error");
+          }
+        }
+
+        selectedFiles = [];
+        renderPreviews();
+        showNotification("All files processed!", "info");
+      } catch (err) {
+        console.error(err);
+        showNotification("Encryption/Upload error: " + err.message, "error");
+      } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = originalText;
+      }
+    };
+  })();
+</script>
+{% endblock %}

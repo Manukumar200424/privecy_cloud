@@ -1,0 +1,760 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin Panel - Privacy Cloud{% endblock %}
+{% block page_title %}System Administration{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        position: relative;
+        overflow-x: hidden;
+        overflow-y: auto;
+        min-height: 100vh;
+    }
+    
+    /* Center admin panel content */
+    .app-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+    
+    /* Center main content area */
+    .main-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    /* Center stats summary */
+    .stats-summary {
+        max-width: 1200px;
+        margin: 0 auto 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    /* Center table cards */
+    .table-card {
+        max-width: 1200px;
+        margin: 0 auto 2rem auto;
+    }
+    
+    /* Fixed header for admin panel */
+    body.admin-page header.app-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: rgba(30, 41, 59, 0.9);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 2rem;
+    }
+    
+    /* Fixed sidebar for admin panel */
+    body.admin-page .app-sidebar {
+        position: fixed;
+        left: 0;
+        top: 72px;
+        height: calc(100vh - 72px);
+        z-index: 999;
+    }
+    
+    /* Main content spacing for admin panel */
+    body.admin-page .main-content {
+        padding-top: 92px; /* Account for fixed header */
+    }
+    
+    /* Ensure admin panel header actions are properly positioned */
+    body.admin-page .header-nav {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin-left: auto;
+    }
+    
+    body.admin-page .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    body.admin-page .user-profile-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    body.admin-page .user-profile-badge:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    body.admin-page .logout-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    
+    body.admin-page .logout-btn:hover {
+        background: rgba(239, 68, 68, 0.8);
+        border-color: rgba(239, 68, 68, 0.9);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Ensure content stays above 3D background but below navigation */
+    .app-container, .main-content, .table-card, .stat-box, .stats-summary {
+        position: relative;
+        z-index: 5; /* Below navigation */
+    }
+    
+    /* Make sure navigation stays on top */
+    nav, .navbar, header, .top-nav {
+        position: relative;
+        z-index: 100 !important; /* Above all content */
+    }
+    
+    /* Make all content areas transparent */
+    body, .container, .content-wrapper, .main-content {
+        background: transparent !important;
+    }
+    
+    /* Remove any solid backgrounds */
+    .table-card, .stat-box, .stats-summary,
+    .table-header, .thread-item, .msg-bubble,
+    .user-row, th, td, input, button,
+    .table-card > div > div[style*="grid"] {
+        background: rgba(30, 41, 59, 0.2) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        position: relative;
+        z-index: 5; /* Below navigation */
+    }
+    
+    /* Enhanced glass morphism effect for 3D background */
+    .table-card, .stat-box, .stats-summary {
+        background: rgba(30, 41, 59, 0.4);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Apply same transparency to all sections */
+    .table-header {
+        background: rgba(30, 41, 59, 0.3);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .thread-item {
+        background: rgba(30, 41, 59, 0.2);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .thread-item:hover {
+        background: rgba(59, 130, 246, 0.3);
+        backdrop-filter: blur(20px);
+    }
+    
+    .thread-item.active {
+        background: rgba(59, 130, 246, 0.4);
+        backdrop-filter: blur(20px);
+    }
+    
+    .msg-bubble {
+        background: rgba(30, 41, 59, 0.3);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .bubble-admin {
+        background: rgba(59, 130, 246, 0.6);
+        backdrop-filter: blur(20px);
+    }
+    
+    .user-row {
+        background: rgba(30, 41, 59, 0.1);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .user-row:hover {
+        background: rgba(59, 130, 246, 0.2);
+        backdrop-filter: blur(20px);
+    }
+    
+    th {
+        background: rgba(30, 41, 59, 0.3);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    td {
+        background: rgba(30, 41, 59, 0.1);
+        backdrop-filter: blur(20px);
+    }
+    
+    /* Input same transparency */
+    input, button {
+        background: rgba(30, 41, 59, 0.4);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Semi-transparent overlays for better readability */
+    .main-content::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at center, transparent 0%, rgba(15, 23, 42, 0.4) 100%);
+        pointer-events: none;
+        z-index: 1;
+    }
+</style>
+
+<script src="{{ url_for('static', filename='threejs-background.js') }}"></script>
+<script src="{{ url_for('static', filename='admin-animations.js') }}"></script>
+<style>
+    .stats-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+    }
+
+    .stat-box {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius-lg);
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-height: 80px;
+    }
+
+    .stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .stat-data h4 {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .stat-data .value {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--text-primary);
+    }
+
+    .usage-bar {
+        width: 100%;
+        height: 8px;
+        background: var(--bg-main);
+        border-radius: 100px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+
+    .usage-fill {
+        height: 100%;
+        background: var(--primary);
+        border-radius: 100px;
+    }
+</style>
+
+<div class="stats-summary">
+    <div class="stat-box pulse-animation">
+        <div class="stat-icon glow-effect">
+            <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="stat-data">
+            <h4>Total Users</h4>
+            <div class="value">{{ total_users }}</div>
+            <div class="progress-bar-animated" style="margin-top: 0.5rem; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1);">
+                <div style="width: 100%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 2px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="stat-box pulse-animation">
+        <div class="stat-icon glow-effect">
+            <i class="fa-solid fa-database"></i>
+        </div>
+        <div class="stat-data">
+            <h4>Storage Used</h4>
+            <div class="value">{{ total_storage_formatted }}</div>
+            <div class="progress-bar-animated" style="margin-top: 0.5rem; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1);">
+                <div style="width: 65%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--warning)); border-radius: 2px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="stat-box pulse-animation">
+        <div class="stat-icon glow-effect">
+            <i class="fa-solid fa-file-shield"></i>
+        </div>
+        <div class="stat-data">
+            <h4>Total Files</h4>
+            <div class="value">{{ total_files }}</div>
+            <div class="progress-bar-animated" style="margin-top: 0.5rem; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1);">
+                <div style="width: 80%; height: 100%; background: linear-gradient(90deg, var(--success), var(--primary)); border-radius: 2px;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="stat-box pulse-animation">
+        <div class="stat-icon glow-effect">
+            <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+        <div class="stat-data">
+            <h4>System Health</h4>
+            <div class="value" style="color: var(--success);">Healthy</div>
+            <div class="circular-progress" style="margin-top: 0.5rem;">
+                <svg width="60" height="60">
+                    <circle cx="30" cy="30" r="25" stroke="rgba(16, 185, 129, 0.2)" stroke-width="4" fill="none"/>
+                    <circle cx="30" cy="30" r="25" stroke="var(--success)" stroke-width="4" fill="none"
+                            stroke-dasharray="157" stroke-dashoffset="0" class="progress-ring"/>
+                </svg>
+                <div class="progress-text">99%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Overview -->
+<div class="table-card" style="margin-top: 1rem; margin-bottom: 1rem; padding: 1rem;">
+    <div class="table-header" style="padding: 1rem;">
+        <h3 style="margin: 0; font-size: 1rem; font-weight: 700;"><i class="fa-solid fa-chart-line"
+                style="color: var(--primary); margin-right: 0.5rem;"></i> System Overview</h3>
+        <div style="display: flex; gap: 0.5rem;">
+            <button class="btn-secondary" onclick="refreshSystemStats()" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                <i class="fa-solid fa-sync"></i> Refresh
+            </button>
+            <button class="btn-primary" onclick="exportSystemData()" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                <i class="fa-solid fa-download"></i> Export
+            </button>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem;">
+        <!-- Database Status -->
+        <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: var(--border-radius-md);">
+            <h4 style="color: var(--primary); margin-bottom: 0.5rem; font-size: 0.875rem;"><i class="fa-solid fa-server"></i> Database Status</h4>
+            <div style="display: grid; gap: 0.25rem; font-size: 0.875rem;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Connection:</span>
+                    <span style="color: var(--success);">Active</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Response Time:</span>
+                    <span id="dbResponseTime">45ms</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Uptime:</span>
+                    <span id="systemUptime">99.9%</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Storage Analytics -->
+        <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: var(--border-radius-md);">
+            <h4 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 0.875rem;"><i class="fa-solid fa-hdd"></i> Storage Analytics</h4>
+            <div style="display: grid; gap: 0.25rem; font-size: 0.875rem;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Total Storage:</span>
+                    <span>{{ total_storage_formatted }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Used Storage:</span>
+                    <span>{{ total_storage_formatted }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Available:</span>
+                    <span>Unlimited</span>
+                </div>
+                <div style="margin-top: 0.25rem;">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Storage Usage</div>
+                    <div style="width: 100%; height: 4px; background: var(--bg-main); border-radius: 100px; overflow: hidden;">
+                        <div style="width: 65%; height: 100%; background: var(--primary); border-radius: 100px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Support Messages -->
+<div class="table-card" style="margin-top: 1rem; margin-bottom: 1rem; padding: 1rem;">
+    <div class="table-header" style="padding: 1rem;">
+        <h3 style="margin: 0; font-size: 1rem; font-weight: 700;"><i class="fa-solid fa-headset"
+                style="color: var(--primary); margin-right: 0.5rem;"></i> Support Messages</h3>
+        <button class="btn-secondary" onclick="loadThreads()" style="margin: 0; padding: 0.25rem 0.5rem; font-size: 0.875rem;"><i
+                class="fa-solid fa-rotate"></i> Refresh</button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 350px 1fr; min-height: 350px;">
+        <!-- Thread List -->
+        <div style="border-right: 1px solid var(--border); overflow-y: auto; max-height: 350px;" id="threadList">
+            <!-- Threads loaded via JS -->
+        </div>
+
+        <!-- Active Chat -->
+        <div style="display: flex; flex-direction: column; background: rgba(0,0,0,0.1);" id="adminChatContainer">
+            <div id="noThreadSelected"
+                style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); min-height: 300px;">
+                <i class="fa-solid fa-comments" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.3;"></i>
+                <p style="font-size: 0.875rem;">Select a user thread to start replying</p>
+            </div>
+
+            <div id="activeThreadArea" style="display: none; height: auto; min-height: 300px; flex-direction: column;">
+                <div
+                    style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02);">
+                    <div style="font-weight: 700; color: var(--text-primary); font-size: 0.875rem;" id="activeUserName">User Name</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);" id="activeUserId">ID: ...</div>
+                </div>
+
+                <div style="flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; max-height: 200px;"
+                    id="adminChatMessages">
+                    <!-- Messages -->
+                </div>
+
+                <div style="padding: 1rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem;">
+                    <input type="text" id="adminChatInput" placeholder="Type your reply..."
+                        style="flex: 1; background: var(--bg-main); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.75rem; color: white; font-size: 0.875rem;">
+                    <button class="btn-primary" style="margin: 0; padding: 0.5rem 0.75rem; font-size: 0.875rem;" id="adminSendBtn">Send Reply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Management -->
+<div class="table-card" style="margin-top: 1rem; margin-bottom: 1rem; padding: 1rem;">
+    <div class="table-header" style="padding: 1rem;">
+        <h3 style="margin: 0; font-size: 1rem; font-weight: 700;">User Management</h3>
+        <div style="position: relative;">
+            <i class="fa-solid fa-magnifying-glass"
+                style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+            <input type="text" id="userSearch" onkeyup="filterUsers()" placeholder="Search users..."
+                style="padding: 0.5rem 0.75rem 0.5rem 2rem; background: var(--bg-main); border: 1px solid var(--border); border-radius: 8px; color: white; font-size: 0.875rem;">
+        </div>
+    </div>
+    <table id="usersTable" style="font-size: 0.875rem;">
+        <thead>
+            <tr>
+                <th style="padding: 0.75rem;">User Details</th>
+                <th style="padding: 0.75rem;">Last Activity</th>
+                <th style="padding: 0.75rem;">File Statistics</th>
+                <th style="padding: 0.75rem;">Storage Usage</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr class="user-row slide-in-left">
+                <td style="padding: 0.75rem;">
+                    <div style="font-weight: 700;">{{ user.username }}</div>
+                    {% if user.is_admin %}<span class="user-badge pulse-animation">ADMIN</span>{% endif %}
+                </td>
+                <td style="padding: 0.75rem;"><span style="color: var(--text-secondary);">{{ user.last_active }}</span></td>
+                <td style="padding: 0.75rem;">
+                    <div style="font-weight: 600;">{{ user.file_count }} files</div>
+                    <button class="btn-secondary" style="margin-left: 0.5rem; padding: 0.125rem 0.375rem; font-size: 0.75rem;" 
+                            onclick="showTransfer('{{ user.username }}', 'files')">
+                        <i class="fa-solid fa-eye"></i> View
+                    </button>
+                </td>
+                <td style="padding: 0.75rem; min-width: 150px;">
+                    <div
+                        style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                        <span>{{ user.storage_formatted }}</span>
+                        <span style="color: var(--text-muted);">{{ user.storage_percent|round(1) }}%</span>
+                    </div>
+                    <div class="usage-bar" style="height: 4px;">
+                        <div class="usage-fill transfer-animation" style="width: {{ user.storage_percent }}%;"></div>
+                    </div>
+                    <button class="btn-primary" style="margin-top: 0.25rem; width: 100%; padding: 0.25rem 0.5rem; font-size: 0.75rem;" 
+                            onclick="showTransfer('{{ user.username }}', 'storage')">
+                        <i class="fa-solid fa-exchange-alt"></i> Transfer Data
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .thread-item {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .thread-item:hover {
+        background: rgba(255, 255, 255, 0.03);
+        transform: translateX(5px);
+    }
+
+    .thread-item.active {
+        background: rgba(59, 130, 246, 0.1);
+        border-left: 3px solid var(--primary);
+    }
+
+    .msg-bubble {
+        max-width: 80%;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .bubble-user {
+        align-self: flex-start;
+        background: var(--bg-main);
+        border: 1px solid var(--border);
+    }
+
+    .bubble-admin {
+        align-self: flex-end;
+        background: var(--primary);
+        color: white;
+    }
+
+    .user-badge {
+        display: inline-flex;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary);
+    }
+
+    .table-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius-lg);
+        overflow: hidden;
+    }
+
+    .table-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        text-align: left;
+        padding: 1rem 2rem;
+        background: rgba(15, 23, 42, 0.3);
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    td {
+        padding: 1.25rem 2rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-primary);
+        font-size: 0.95rem;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+</style>
+
+<script>
+    let activeUserId = null;
+    let pollInterval = null;
+
+    const loadThreads = async () => {
+        const r = await fetch('/api/admin/chat/threads');
+        const d = await r.json();
+        const container = document.getElementById('threadList');
+        if (d.threads) {
+            container.innerHTML = d.threads.map(t => {
+                const timeString = new Date(t.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                return `
+                <div class="thread-item ${activeUserId === t.user_id ? 'active' : ''}" onclick="selectThread('${t.user_id}', '${t.username}')">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                        <span style="font-weight: 700; color: var(--text-primary);">${t.username}</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">${timeString}</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        ${t.last_message}
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+    };
+
+    const selectThread = (uid, uname) => {
+        activeUserId = uid;
+        document.getElementById('noThreadSelected').style.display = 'none';
+        document.getElementById('activeThreadArea').style.display = 'flex';
+        document.getElementById('activeUserName').textContent = uname;
+        document.getElementById('activeUserId').textContent = `ID: ${uid}`;
+        loadMessages();
+        loadThreads();
+
+        if (pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(loadMessages, 3000);
+    };
+
+    const loadMessages = async () => {
+        if (!activeUserId) return;
+        const r = await fetch(`/api/chat/history?target_user_id=${activeUserId}`);
+        const d = await r.json();
+        const container = document.getElementById('adminChatMessages');
+        if (d.messages) {
+            container.innerHTML = d.messages.map(m => `
+                <div class="msg-bubble ${m.is_admin ? 'bubble-admin' : 'bubble-user'}">
+                    <div style="font-size: 0.7rem; opacity: 0.7; margin-bottom: 0.2rem;">${m.sender_name}</div>
+                    ${m.message}
+                </div>
+            `).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+    };
+
+    const sendReply = async () => {
+        const input = document.getElementById('adminChatInput');
+        const msg = input.value.trim();
+        if (!msg || !activeUserId) return;
+
+        input.value = '';
+        await fetch('/api/chat/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: msg, target_user_id: activeUserId })
+        });
+        loadMessages();
+    };
+
+    document.getElementById('adminSendBtn').onclick = sendReply;
+    document.getElementById('adminChatInput').onkeypress = (e) => { if (e.key === 'Enter') sendReply(); };
+
+    // Initial load
+    loadThreads();
+    setInterval(loadThreads, 10000); // Background refresh threads
+
+    function filterUsers() {
+        const input = document.getElementById("userSearch");
+        const filter = input.value.toUpperCase();
+        const table = document.getElementById("usersTable");
+        const tr = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < tr.length; i++) {
+            const td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                const txtValue = td.textContent || td.innerText;
+                tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+    }
+
+    // New admin functions
+    const refreshSystemStats = async () => {
+        try {
+            const response = await fetch('/api/admin/system-stats');
+            const data = await response.json();
+            
+            if (data.success) {
+                document.getElementById('dbResponseTime').textContent = data.db_response_time + 'ms';
+                document.getElementById('systemUptime').textContent = data.uptime + '%';
+                showNotification('System stats refreshed', 'success');
+            }
+        } catch (error) {
+            showNotification('Failed to refresh system stats', 'error');
+        }
+    };
+
+    const exportSystemData = () => {
+        try {
+            const data = {
+                export_date: new Date().toISOString(),
+                total_users: {{ total_users }},
+                total_storage: '{{ total_storage_formatted }}',
+                total_files: {{ total_files }},
+                system_health: 'Healthy'
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `privacy_cloud_admin_export_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('System data exported successfully', 'success');
+        } catch (error) {
+            showNotification('Failed to export system data', 'error');
+        }
+    };
+
+    // Real-time system monitoring
+    setInterval(async () => {
+        try {
+            const response = await fetch('/api/admin/health-check');
+            const data = await response.json();
+            
+            if (data.success) {
+                document.getElementById('dbResponseTime').textContent = data.response_time + 'ms';
+                document.getElementById('systemUptime').textContent = data.uptime + '%';
+            }
+        } catch (error) {
+            console.error('Health check failed:', error);
+        }
+    }, 30000); // Check every 30 seconds
+</script>
+{% endblock %}

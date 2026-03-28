@@ -1,0 +1,345 @@
+{% extends "layout.html" %}
+
+{% block title %}Register - Privacy Cloud{% endblock %}
+
+{% block body %}
+<style>
+  @keyframes authFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes glow {
+
+    0%,
+    100% {
+      opacity: 0.7;
+    }
+
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .main-content {
+    background:
+      radial-gradient(ellipse at 80% 50%, rgba(139, 92, 246, 0.14) 0%, transparent 60%),
+      radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+      #0f172a !important;
+  }
+
+  /* ── Card ── */
+  .auth-card {
+    max-width: 560px;
+    width: 100%;
+    margin: 3rem auto;
+    padding: 0;
+    position: relative;
+    border-radius: 24px;
+    background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow:
+      0 0 0 1px rgba(139, 92, 246, 0.15),
+      0 25px 60px rgba(0, 0, 0, 0.55),
+      0 0 80px -20px rgba(139, 92, 246, 0.2);
+    animation: authFadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease;
+  }
+
+  .auth-card:hover {
+    transform: rotateY(-2deg) rotateX(2deg) scale(1.02);
+  }
+
+  /* Glowing purple-blue top bar */
+  .auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #8b5cf6, #3b82f6, #ec4899, #3b82f6, #8b5cf6);
+    border-radius: 24px 24px 0 0;
+    animation: glow 2.5s ease-in-out infinite;
+  }
+
+  /* ── Header ── */
+  .auth-header {
+    text-align: center;
+    padding: 3.5rem 3rem 2rem;
+    margin-bottom: 0;
+  }
+
+  .auth-header h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin: 0 0 0.75rem;
+    color: white;
+  }
+
+  .auth-header h2 em {
+    font-style: normal;
+    background: linear-gradient(135deg, #a78bfa 30%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .auth-header p {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  /* ── Form ── */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 1.25rem;
+    padding: 0 3rem;
+  }
+
+  .form-group {
+    margin: 0;
+    padding: 0 3rem 1.25rem;
+  }
+
+  .form-row .form-group {
+    padding: 0 0 1.25rem;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: #f1f5f9;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: all 0.25s;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .form-group select option {
+    background: #1e293b;
+    color: #f1f5f9;
+  }
+
+  .form-group input::placeholder {
+    color: #334155;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.07);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+  }
+
+  /* Divider */
+  .form-divider {
+    padding: 0.25rem 3rem 1.25rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #334155;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  /* ── Submit Button ── */
+  #registerBtn {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.45) !important;
+  }
+
+  #registerBtn:hover:not(:disabled) {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.6) !important;
+  }
+
+  /* ── Footer ── */
+  .auth-footer {
+    padding: 1.5rem 3rem 2.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+    font-size: 0.875rem;
+    color: #475569;
+    margin-top: 0.5rem;
+  }
+
+  .auth-footer a {
+    color: #a78bfa;
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.2s;
+  }
+
+  .auth-footer a:hover {
+    color: #ddd6fe;
+    text-decoration: underline;
+  }
+</style>
+
+<div class="auth-card">
+  <div class="auth-header">
+    <h2>Create <em>Account</em></h2>
+    <p>Join Privacy Cloud and secure your files</p>
+  </div>
+
+  <form id="registerForm" onsubmit="return false;">
+
+    <div class="form-divider">Account Credentials</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Choose username" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="your@email.com" required>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Create password" required>
+      </div>
+      <div class="form-group">
+        <label for="passconfirm">Confirm Password</label>
+        <input type="password" id="passconfirm" placeholder="Confirm password" required>
+      </div>
+    </div>
+
+    <div class="form-divider">Personal Information</div>
+
+    <div class="form-group">
+      <label for="fullname">Full Name</label>
+      <input type="text" id="fullname" placeholder="Enter your full name" required>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" placeholder="+1 234 567 8900">
+      </div>
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <select id="gender">
+          <option value="" disabled selected>Select gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+          <option value="prefer_not">Prefer not to say</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="dob">Date of Birth</label>
+      <input type="date" id="dob">
+    </div>
+
+    <div class="form-group">
+      <button id="registerBtn" class="btn-primary" style="width: 100%; margin: 0; padding: 0.875rem;">Create My
+        Vault</button>
+    </div>
+  </form>
+
+  <div class="auth-footer">
+    Already have an account? <a href="{{ url_for('login') }}">Login here</a>
+  </div>
+</div>
+
+<script>
+  document.getElementById("registerBtn").onclick = async () => {
+    const button = document.getElementById("registerBtn");
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const passconfirm = document.getElementById("passconfirm").value;
+    const email = document.getElementById("email").value.trim();
+    const fullname = document.getElementById("fullname").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const gender = document.getElementById("gender").value;
+    const dob = document.getElementById("dob").value;
+
+    if (!username || !password || !email || !fullname) {
+      showNotification("Please fill in all required fields", "error");
+      return;
+    }
+
+    if (username.length < 3) {
+      showNotification("Username must be at least 3 characters", "error");
+      return;
+    }
+
+    if (password.length < 6) {
+      showNotification("Password must be at least 6 characters", "error");
+      return;
+    }
+
+    if (password !== passconfirm) {
+      showNotification("Passwords do not match", "error");
+      return;
+    }
+
+    button.disabled = true;
+    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating Your Vault...';
+
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, email, fullname, phone, gender, dob })
+      });
+      const j = await res.json();
+
+      if (res.ok && j.ok) {
+        showNotification("Account created! Redirecting to login...", "success");
+        setTimeout(() => { window.location = "/login"; }, 1500);
+      } else {
+        showNotification(j.error || "Registration failed", "error");
+      }
+    } catch (err) {
+      showNotification("Network error. Please try again.", "error");
+    } finally {
+      button.disabled = false;
+      button.textContent = "Create My Vault";
+    }
+  };
+</script>
+{% endblock %}

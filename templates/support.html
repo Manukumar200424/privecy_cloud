@@ -1,0 +1,423 @@
+{% extends "layout.html" %}
+
+{% block title %}Support & Resources - Privacy Cloud{% endblock %}
+{% block page_title %}Help Center{% endblock %}
+
+{% block body %}
+<style>
+  .support-hero {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 40%),
+      var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 4rem;
+  }
+
+  .help-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 5rem;
+  }
+
+  .help-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-md);
+    padding: 2.5rem;
+    transition: var(--transition);
+    text-align: left;
+  }
+
+  .help-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .help-icon {
+    width: 56px;
+    height: 56px;
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--primary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .faq-section {
+    margin-bottom: 5rem;
+  }
+
+  .faq-category {
+    margin-bottom: 3rem;
+  }
+
+  .category-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .faq-item {
+    margin-bottom: 1rem;
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+  }
+
+  .faq-question {
+    padding: 1.25rem 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .faq-question:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .faq-answer {
+    padding: 0 1.5rem 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    display: none;
+  }
+
+  .faq-item.active .faq-answer {
+    display: block;
+  }
+
+  .faq-item.active .faq-question i {
+    transform: rotate(180deg);
+  }
+
+  .spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+
+  .spec-table td {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+
+  .spec-label {
+    color: var(--text-muted);
+    font-weight: 600;
+    width: 40%;
+  }
+
+  .spec-value {
+    color: var(--text-primary);
+    font-family: monospace;
+  }
+</style>
+
+<div class="support-hero">
+  <span class="badge"
+    style="background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 0.5rem 1rem; border-radius: 100px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem; display: inline-block;">Knowledge
+    Base</span>
+  <h1
+    style="font-family: 'Outfit', sans-serif; font-size: 3rem; font-weight: 800; color: var(--text-primary); margin-bottom: 1rem;">
+    Solutions for every need.</h1>
+  <p style="color: var(--text-secondary); font-size: 1.2rem; max-width: 600px; margin: 0 auto 2.5rem;">Everything you
+    need to know about securing your digital life with Privacy Cloud.</p>
+
+  <div style="max-width: 500px; margin: 0 auto; position: relative;">
+    <i class="fa-solid fa-magnifying-glass"
+      style="position: absolute; left: 1.25rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+    <input type="text" placeholder="Search for guides, security details..."
+      style="width: 100%; padding: 1rem 1.5rem 1rem 3.5rem; background: var(--bg-main); border: 1px solid var(--border); border-radius: 100px; color: white;">
+  </div>
+</div>
+
+<div class="help-grid">
+  <div class="help-card">
+    <div class="help-icon"><i class="fa-solid fa-rocket"></i></div>
+    <h3>Getting Started</h3>
+    <p>New to Privacy Cloud? Learn how to create your first encrypted vault in under 2 minutes.</p>
+    <a href="#"
+      style="color: var(--primary); font-weight: 700; text-decoration: none; display: inline-block; margin-top: 1rem;">View
+      Guide →</a>
+  </div>
+  <div class="help-card">
+    <div class="help-icon"><i class="fa-solid fa-shield-halved"></i></div>
+    <h3>Security Specs</h3>
+    <table class="spec-table">
+      <tr>
+        <td class="spec-label">Algorithm</td>
+        <td class="spec-value">AES-256-GCM</td>
+      </tr>
+      <tr>
+        <td class="spec-label">Key Derivation</td>
+        <td class="spec-value">PBKDF2 (200k)</td>
+      </tr>
+      <tr>
+        <td class="spec-label">Architecture</td>
+        <td class="spec-value">Zero-Knowledge</td>
+      </tr>
+    </table>
+  </div>
+  <div class="help-card">
+    <div class="help-icon"><i class="fa-solid fa-code"></i></div>
+    <h3>API & Webhooks</h3>
+    <p>Integrate Privacy Cloud directly into your workflow with our developer-first API endpoints.</p>
+    <a href="#"
+      style="color: var(--primary); font-weight: 700; text-decoration: none; display: inline-block; margin-top: 1rem;">Documentation
+      →</a>
+  </div>
+</div>
+
+<div class="faq-section">
+  <div class="faq-category">
+    <div class="category-title"><i class="fa-solid fa-lock" style="color: var(--primary);"></i> Privacy & Encryption
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">How is my data encrypted? <i class="fa-solid fa-chevron-down"></i></div>
+      <div class="faq-answer">Your data is encrypted locally using the Web Crypto API. We use AES-256-GCM for file
+        content and PBKDF2 with 200,000 iterations for key derivation from your password. This ensures your keys never
+        touch the internet.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">What does "Zero-Knowledge" mean? <i class="fa-solid fa-chevron-down"></i></div>
+      <div class="faq-answer">It means Privacy Cloud cannot access your data even if we wanted to. Your password is
+        never sent to our servers; it is only used as a seed for the encryption engine in your local browser
+        environment.</div>
+    </div>
+  </div>
+
+  <div class="faq-category">
+    <div class="category-title"><i class="fa-solid fa-cloud" style="color: var(--primary);"></i> Storage & Performance
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">Is there a file size limit? <i class="fa-solid fa-chevron-down"></i></div>
+      <div class="faq-answer">Standard accounts support files up to 2GB. For files larger than 500MB, we recommend using
+        a stable connection as browser-based encryption requires significant memory resources.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">Will encryption slow down my uploads? <i class="fa-solid fa-chevron-down"></i></div>
+      <div class="faq-answer">While encryption adds a processing step, our engine is highly optimized using your
+        device's hardware acceleration via the Web Crypto API, resulting in near-native speed.</div>
+    </div>
+  </div>
+</div>
+
+<div
+  style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), transparent); border: 1px solid var(--border); border-radius: var(--border-radius-lg); padding: 4rem; text-align: center;">
+  <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem;">Still have questions?</h2>
+  <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 2.5rem;">Our security experts are available
+    24/7 to help you protect your digital assets.</p>
+  <div style="display: flex; gap: 1rem; justify-content: center;">
+    <a href="mailto:support@privacycloud.com" class="btn-primary" style="padding: 1rem 2.5rem;">Contact Experts</a>
+    <button class="btn-secondary" style="padding: 1rem 2.5rem;" id="openChatBtn">Live Chat</button>
+  </div>
+</div>
+
+<!-- Chat Modal -->
+<div id="chatModal" class="chat-modal">
+  <div class="chat-header">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div class="avatar-sm" style="background: var(--primary);">PC</div>
+      <div>
+        <div style="font-weight: 700; font-size: 0.9rem;">Security Support</div>
+        <div style="font-size: 0.7rem; color: var(--success); display: flex; align-items: center; gap: 0.25rem;">
+          <div style="width: 6px; height: 6px; background: var(--success); border-radius: 50%;"></div> Online
+        </div>
+      </div>
+    </div>
+    <button id="closeChatBtn" style="background: none; border: none; color: var(--text-muted); cursor: pointer;"><i
+        class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <!-- Messages loaded dynamicly -->
+  </div>
+  <div class="chat-input-area">
+    <input type="text" id="chatInput" placeholder="Type your message..." autocomplete="off">
+    <button id="sendChatBtn"><i class="fa-solid fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<style>
+  .chat-modal {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 360px;
+    height: 500px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+    overflow: hidden;
+  }
+
+  .chat-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .chat-messages {
+    flex: 1;
+    padding: 1.25rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .msg {
+    max-width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .msg-user {
+    align-self: flex-end;
+    background: var(--primary);
+    color: white;
+    border-bottom-right-radius: 2px;
+  }
+
+  .msg-admin {
+    align-self: flex-start;
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-bottom-left-radius: 2px;
+  }
+
+  .chat-input-area {
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .chat-input-area input {
+    flex: 1;
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 0.6rem 1rem;
+    color: white;
+    font-size: 0.9rem;
+  }
+
+  .chat-input-area button {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+  }
+
+  .chat-input-area button:hover {
+    transform: scale(1.05);
+  }
+</style>
+
+<script>
+  // FAQ Toggle Logic
+  document.querySelectorAll('.faq-question').forEach(q => {
+    q.addEventListener('click', () => {
+      const item = q.parentElement;
+      item.classList.toggle('active');
+    });
+  });
+
+  const chatModal = document.getElementById('chatModal');
+  const openChatBtn = document.getElementById('openChatBtn');
+  const closeChatBtn = document.getElementById('closeChatBtn');
+  const chatMessages = document.getElementById('chatMessages');
+  const chatInput = document.getElementById('chatInput');
+  const sendChatBtn = document.getElementById('sendChatBtn');
+
+  let chatInterval;
+
+  const loadHistory = async () => {
+    try {
+      const r = await fetch('/api/chat/history');
+      const d = await r.json();
+      if (d.messages) {
+        chatMessages.innerHTML = d.messages.map(m => `
+                    <div class="msg ${m.is_admin ? 'msg-admin' : 'msg-user'}">
+                        <div style="font-size: 0.7rem; opacity: 0.7; margin-bottom: 0.25rem;">
+                            ${m.is_admin ? 'Support Agent' : 'You'}
+                        </div>
+                        ${m.message}
+                    </div>
+                `).join('');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    } catch (e) { }
+  };
+
+  openChatBtn.onclick = () => {
+    chatModal.style.display = 'flex';
+    loadHistory();
+    chatInterval = setInterval(loadHistory, 3000); // Poll for replies
+  };
+
+  closeChatBtn.onclick = () => {
+    chatModal.style.display = 'none';
+    clearInterval(chatInterval);
+  };
+
+  const sendMessage = async () => {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+
+    chatInput.value = '';
+    try {
+      await fetch('/api/chat/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg })
+      });
+      loadHistory();
+    } catch (e) { }
+  };
+
+  sendChatBtn.onclick = sendMessage;
+  chatInput.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
+</script>
+{% endblock %}
